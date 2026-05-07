@@ -22,7 +22,7 @@ function App() {
   const scoreStyle = useMemo(() => {
     const score = result?.match_score ?? 0;
     return {
-      background: `conic-gradient(#0f766e ${score * 3.6}deg, #d8dee7 0deg)`
+      background: `conic-gradient(#0f766e ${score * 3.6}deg, #d8dee7 0deg)`,
     };
   }, [result]);
 
@@ -47,10 +47,13 @@ function App() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        body: formData
-      });
+      const response = await fetch(
+        "https://airesumeanalyzer-luly.onrender.com",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
       const responseText = await response.text();
       let data = {};
 
@@ -58,7 +61,9 @@ function App() {
         try {
           data = JSON.parse(responseText);
         } catch {
-          throw new Error(responseText || "The server returned an unreadable response.");
+          throw new Error(
+            responseText || "The server returned an unreadable response.",
+          );
         }
       }
 
@@ -86,7 +91,8 @@ function App() {
           <p className="eyebrow">Resume intelligence</p>
           <h1>AI Resume Analyzer</h1>
           <p>
-            Upload a resume, paste a job description, and get a practical match report with missing skills and keyword coverage.
+            Upload a resume, paste a job description, and get a practical match
+            report with missing skills and keyword coverage.
           </p>
         </div>
 
@@ -99,7 +105,9 @@ function App() {
               accept=".txt,.pdf"
               onChange={(event) => setResume(event.target.files?.[0] || null)}
             />
-            <span className="hint">{resume ? resume.name : "PDF or TXT accepted"}</span>
+            <span className="hint">
+              {resume ? resume.name : "PDF or TXT accepted"}
+            </span>
           </div>
 
           <div className="field">
@@ -124,7 +132,10 @@ function App() {
         {!result && (
           <div className="empty-state">
             <h2>Report Preview</h2>
-            <p>Your match score, keywords, missing skills, and suggestions will appear here.</p>
+            <p>
+              Your match score, keywords, missing skills, and suggestions will
+              appear here.
+            </p>
           </div>
         )}
 
@@ -136,9 +147,16 @@ function App() {
               </div>
               <div>
                 <p className="eyebrow">Match score</p>
-                <h2>{result.match_score >= 70 ? "Strong fit" : result.match_score >= 45 ? "Promising fit" : "Needs tailoring"}</h2>
+                <h2>
+                  {result.match_score >= 70
+                    ? "Strong fit"
+                    : result.match_score >= 45
+                      ? "Promising fit"
+                      : "Needs tailoring"}
+                </h2>
                 <p>
-                  Text similarity: {result.similarity_score}% | Keyword score: {result.keyword_score}%
+                  Text similarity: {result.similarity_score}% | Keyword score:{" "}
+                  {result.keyword_score}%
                 </p>
               </div>
             </div>

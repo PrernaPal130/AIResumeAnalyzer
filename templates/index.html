@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Resume Analyzer</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #dadce0;
+      --panel: #ffffff;
+      --accent: #0f766e;
+      --accent-soft: #d9f5f0;
+      --page: #f7f8fa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--page);
+      color: var(--ink);
+    }
+
+    main {
+      width: min(980px, calc(100% - 32px));
+      margin: 32px auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      letter-spacing: 0;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    form,
+    .report,
+    .error {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 16px 0 8px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      font: inherit;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 16px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent);
+      color: white;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(0.95);
+    }
+
+    .score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 120px;
+    }
+
+    .box h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .error {
+      border-color: #f1a7a7;
+      color: #8a1f1f;
+      background: #fff4f4;
+    }
+
+    @media (max-width: 720px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AI Resume Analyzer</h1>
+    <p>Upload a PDF or TXT resume, paste a job description, and get a match report.</p>
+
+    <form method="post" enctype="multipart/form-data">
+      <label for="resume">Resume file</label>
+      <input id="resume" name="resume" type="file" accept=".txt,.pdf" required>
+
+      <label for="job_description">Job description</label>
+      <textarea id="job_description" name="job_description" required></textarea>
+
+      <button type="submit">Analyze Resume</button>
+    </form>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+      <section class="report">
+        <div class="score">{{ result.match_score }}%</div>
+        <p>Text similarity: {{ result.similarity_score }}% | Keyword score: {{ result.keyword_score }}%</p>
+
+        <div class="grid">
+          <div class="box">
+            <h2>Keywords Found</h2>
+            <p>{{ result.keywords_found | join(", ") if result.keywords_found else "None" }}</p>
+          </div>
+
+          <div class="box">
+            <h2>Missing Skills</h2>
+            <p>{{ result.missing_skills | join(", ") if result.missing_skills else "None" }}</p>
+          </div>
+
+          <div class="box">
+            <h2>Resume Keywords</h2>
+            <p>{{ result.resume_keywords | join(", ") if result.resume_keywords else "None" }}</p>
+          </div>
+
+          <div class="box">
+            <h2>Suggestions</h2>
+            <ul>
+              {% for suggestion in result.suggestions %}
+                <li>{{ suggestion }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+  </main>
+</body>
+</html>

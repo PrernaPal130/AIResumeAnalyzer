@@ -1,0 +1,55 @@
+{
+  "match_score": 16,
+  "similarity_score": 15.03,
+  "keyword_score": 16.67,
+  "keywords_found": [
+    "react"
+  ],
+  "resume_keywords": [
+    "communication",
+    "css",
+    "git",
+    "html",
+    "javascript",
+    "react",
+    "sql"
+  ],
+  "job_description_keywords": [
+    "api",
+    "ci/cd",
+    "leadership",
+    "react",
+    "testing",
+    "typescript"
+  ],
+  "required_skills": [
+    "api",
+    "ci/cd",
+    "leadership",
+    "react",
+    "testing",
+    "typescript"
+  ],
+  "preferred_skills": [],
+  "missing_skills": [
+    "api",
+    "ci/cd",
+    "leadership",
+    "testing",
+    "typescript"
+  ],
+  "missing_required_skills": [
+    "api",
+    "ci/cd",
+    "leadership",
+    "testing",
+    "typescript"
+  ],
+  "missing_preferred_skills": [],
+  "suggestions": [
+    "Prioritize required skills first: api, ci/cd, leadership, testing, typescript.",
+    "Mirror important job-description keywords naturally in your summary and bullet points.",
+    "Use measurable achievements, such as performance gains, cost savings, users served, or project outcomes."
+  ],
+  "created_at": "2026-05-06T01:42:18"
+}

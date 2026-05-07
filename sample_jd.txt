@@ -1,0 +1,11 @@
+We are hiring a Python Developer to build internal web tools and data-driven dashboards.
+
+Requirements:
+- Strong Python programming experience
+- Experience with Flask or Django
+- SQL and PostgreSQL database knowledge
+- Ability to build REST APIs
+- Familiarity with pandas, NumPy, and data analysis
+- Git version control
+- Good communication and Agile teamwork
+- Bonus: React, Docker, AWS, and unit testing

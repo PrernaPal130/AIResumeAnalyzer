@@ -1,0 +1,20 @@
+Priya Sharma
+Software Developer
+
+Summary
+Python developer with experience building web applications, REST APIs, and data analysis tools. Strong background in Flask, SQL, Git, HTML, CSS, and JavaScript.
+
+Experience
+Software Developer Intern
+- Built a Flask dashboard for tracking customer metrics.
+- Created REST API endpoints and connected them to a PostgreSQL database.
+- Used pandas and NumPy to clean and analyze CSV datasets.
+- Collaborated with team members using Git and Agile practices.
+
+Projects
+Resume Screening Tool
+- Developed a Python NLP project that compares resumes with job descriptions.
+- Used keyword matching and cosine similarity to rank candidate profiles.
+
+Skills
+Python, Flask, SQL, PostgreSQL, pandas, NumPy, JavaScript, HTML, CSS, Git, REST API, Agile, Data Analysis

@@ -6,12 +6,14 @@ import tempfile
 from pathlib import Path
 
 from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 
 from analyzer import analyze_resume, save_report_json
 from utils import read_resume_file
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.after_request

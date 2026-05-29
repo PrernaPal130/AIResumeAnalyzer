@@ -164,6 +164,21 @@ textarea:focus {
   padding: 12px;
 }
 
+.save-note,
+.save-warning {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.save-note {
+  color: #0f766e;
+  font-weight: 800;
+}
+
+.save-warning {
+  color: #9f5f00;
+}
+
 .empty-state {
   min-height: 260px;
   padding: 28px;

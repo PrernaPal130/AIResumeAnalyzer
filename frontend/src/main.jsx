@@ -158,6 +158,8 @@ function App() {
                   Text similarity: {result.similarity_score}% | Keyword score:{" "}
                   {result.keyword_score}%
                 </p>
+                {result.database_id && <p className="save-note">Saved report #{result.database_id}</p>}
+                {result.database_warning && <p className="save-warning">{result.database_warning}</p>}
               </div>
             </div>
 

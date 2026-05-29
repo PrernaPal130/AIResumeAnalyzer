@@ -15,6 +15,7 @@ A beginner-friendly Python project that compares a resume with a job description
 - Saves results to `analysis_result.json`
 - Includes a Flask API backend
 - Includes a React frontend built with Vite
+- Can save analysis reports to PostgreSQL when `DATABASE_URL` is configured
 
 ## Folder Structure
 
@@ -22,6 +23,7 @@ A beginner-friendly Python project that compares a resume with a job description
 AIresume/
 ├── analyzer.py
 ├── app.py
+├── db.py
 ├── frontend/
 │   ├── index.html
 │   ├── package.json
@@ -47,6 +49,45 @@ pip install -r requirements.txt
 ```
 
 The CLI can still run without `scikit-learn`; it will use the fallback similarity method. PDF files require `pypdf`.
+
+## PostgreSQL Setup
+
+The app works without a database, but if `DATABASE_URL` is configured it saves every analysis report to PostgreSQL.
+
+Store these fields:
+
+```text
+resume filename
+job description
+match score
+text similarity score
+keyword score
+keywords found
+missing skills
+required skills
+preferred skills
+missing required skills
+missing preferred skills
+suggestions
+full JSON report
+created timestamp
+```
+
+For local development, set:
+
+```bash
+set DATABASE_URL=postgresql://username:password@localhost:5432/ai_resume_analyzer
+```
+
+On Render, create a PostgreSQL database and add its `DATABASE_URL` to the Flask web service environment variables.
+
+The app creates the `analysis_reports` table automatically on startup.
+
+Recent saved reports are available at:
+
+```text
+/api/history
+```
 
 ## Run the CLI
 

@@ -9,11 +9,17 @@ from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
 from analyzer import analyze_resume, save_report_json
+from db import init_database, list_analysis_reports, save_analysis_report
 from utils import read_resume_file
 
 
 app = Flask(__name__)
 CORS(app)
+try:
+    DATABASE_ENABLED = init_database()
+except Exception as database_error:
+    print(f"Database initialization skipped: {database_error}")
+    DATABASE_ENABLED = False
 
 
 @app.after_request
@@ -39,6 +45,12 @@ def _analyze_uploaded_resume(resume, job_description: str) -> dict:
         resume_text = read_resume_file(temp_path)
         result = analyze_resume(resume_text, job_description)
         save_report_json(result)
+        try:
+            database_id = save_analysis_report(result, resume.filename, job_description)
+            if database_id is not None:
+                result["database_id"] = database_id
+        except Exception as database_error:
+            result["database_warning"] = f"Analysis was not saved: {database_error}"
         return result
     finally:
         temp_path.unlink(missing_ok=True)
@@ -55,6 +67,20 @@ def api_analyze():
         return jsonify(result)
     except Exception as exc:
         return jsonify({"error": str(exc), "error_type": type(exc).__name__}), 400
+
+
+@app.route("/api/history", methods=["GET"])
+def api_history():
+    """Return saved analysis reports when PostgreSQL is configured."""
+    try:
+        return jsonify(
+            {
+                "database_enabled": DATABASE_ENABLED,
+                "reports": list_analysis_reports(),
+            }
+        )
+    except Exception as exc:
+        return jsonify({"error": str(exc), "error_type": type(exc).__name__}), 500
 
 
 @app.route("/", methods=["GET", "POST"])

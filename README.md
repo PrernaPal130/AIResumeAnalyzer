@@ -12,6 +12,7 @@ A beginner-friendly Python project that compares a resume with a job description
 - Falls back to a built-in cosine similarity method if `scikit-learn` is unavailable
 - Reports match score, missing skills, keywords found, and suggestions
 - Separates required skills from preferred or bonus skills when the job description has those sections
+- Scores matches with recruiter-style weighting: 50% required skills, 25% preferred skills, 15% keyword match, 10% text similarity
 - Saves results to `analysis_result.json`
 - Includes a Flask API backend
 - Includes a React frontend built with Vite

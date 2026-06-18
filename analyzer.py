@@ -107,15 +107,35 @@ def analyze_resume(resume_text: str, job_description: str) -> dict:
     missing_preferred_skills = preferred_skills - resume_keywords
 
     keyword_score = len(common_keywords) / len(jd_keywords) if jd_keywords else 0
+    required_score = (
+        len(required_skills & resume_keywords) / len(required_skills)
+        if required_skills
+        else keyword_score
+    )
+    preferred_score = (
+        len(preferred_skills & resume_keywords) / len(preferred_skills)
+        if preferred_skills
+        else keyword_score
+    )
 
-    # Blend broad text similarity with explicit skill matching.
-    match_score = round(((similarity * 0.6) + (keyword_score * 0.4)) * 100)
+    # Prioritize recruiter-style skill fit over broad text similarity.
+    match_score = round(
+        (
+            (required_score * 0.50)
+            + (preferred_score * 0.25)
+            + (keyword_score * 0.15)
+            + (similarity * 0.10)
+        )
+        * 100
+    )
     match_score = max(0, min(100, match_score))
 
     return {
         "match_score": match_score,
         "similarity_score": round(similarity * 100, 2),
         "keyword_score": round(keyword_score * 100, 2),
+        "required_score": round(required_score * 100, 2),
+        "preferred_score": round(preferred_score * 100, 2),
         "keywords_found": sorted(common_keywords),
         "resume_keywords": sorted(resume_keywords),
         "job_description_keywords": sorted(jd_keywords),
@@ -138,6 +158,8 @@ def print_report(result: dict) -> None:
     print(f"Match Score: {result['match_score']}%")
     print(f"Text Similarity: {result['similarity_score']}%")
     print(f"Keyword Score: {result['keyword_score']}%")
+    print(f"Required Skills Score: {result['required_score']}%")
+    print(f"Preferred Skills Score: {result['preferred_score']}%")
     print(f"Keywords Found: {format_skill_list(set(result['keywords_found']))}")
     print(f"Required Skills: {format_skill_list(set(result['required_skills']))}")
     print(f"Preferred Skills: {format_skill_list(set(result['preferred_skills']))}")

@@ -33,6 +33,8 @@ analysis_reports = Table(
     Column("match_score", Integer, nullable=False),
     Column("similarity_score", Float, nullable=False),
     Column("keyword_score", Float, nullable=False),
+    Column("required_score", Float, nullable=True),
+    Column("preferred_score", Float, nullable=True),
     Column("keywords_found", JSON, nullable=False),
     Column("missing_skills", JSON, nullable=False),
     Column("required_skills", JSON, nullable=False),
@@ -85,6 +87,8 @@ def save_analysis_report(
         "match_score": result["match_score"],
         "similarity_score": result["similarity_score"],
         "keyword_score": result["keyword_score"],
+        "required_score": result.get("required_score"),
+        "preferred_score": result.get("preferred_score"),
         "keywords_found": result["keywords_found"],
         "missing_skills": result["missing_skills"],
         "required_skills": result["required_skills"],
@@ -97,6 +101,12 @@ def save_analysis_report(
     }
 
     with engine.begin() as connection:
+        existing_columns = {
+            column["name"] for column in connection.dialect.get_columns(connection, "analysis_reports")
+        }
+        values = {
+            key: value for key, value in values.items() if key in existing_columns
+        }
         inserted = connection.execute(
             analysis_reports.insert().returning(analysis_reports.c.id), values
         )

@@ -203,8 +203,8 @@ function App() {
                   <p className="eyebrow">Match score</p>
                   <h2>{fitLabel(result.match_score)}</h2>
                   <p>
-                    Text similarity: {result.similarity_score}% | Keyword
-                    score: {result.keyword_score}%
+                    Required: {result.required_score}% | Preferred:{" "}
+                    {result.preferred_score}% | Keywords: {result.keyword_score}%
                   </p>
                   {result.database_id && (
                     <p className="save-note">Saved report #{result.database_id}</p>
@@ -217,19 +217,19 @@ function App() {
 
               <div className="metrics-grid">
                 <MetricCard
-                  label="Matched"
-                  value={result.keywords_found?.length || 0}
-                  detail="keywords found in both resume and job description"
+                  label="Required score"
+                  value={`${result.required_score ?? 0}%`}
+                  detail="50% of the final score"
                 />
                 <MetricCard
-                  label="Missing required"
-                  value={result.missing_required_skills?.length || 0}
-                  detail="skills to prioritize before applying"
+                  label="Preferred score"
+                  value={`${result.preferred_score ?? 0}%`}
+                  detail="25% of the final score"
                 />
                 <MetricCard
-                  label="Missing preferred"
-                  value={result.missing_preferred_skills?.length || 0}
-                  detail="bonus skills that can strengthen the profile"
+                  label="Text similarity"
+                  value={`${result.similarity_score ?? 0}%`}
+                  detail="10% of the final score"
                 />
               </div>
 

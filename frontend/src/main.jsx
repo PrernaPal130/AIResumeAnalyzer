@@ -3,13 +3,39 @@ import { createRoot } from "react-dom/client";
 import "./styles.css";
 
 const emptyResult = null;
+const apiUrl = "https://airesumeanalyzer-luly.onrender.com/api/analyze";
 
-function formatList(items) {
+function SkillChips({ items, tone = "default" }) {
   if (!items || items.length === 0) {
-    return "None";
+    return <span className="muted-text">None detected</span>;
   }
 
-  return items.join(", ");
+  return (
+    <div className="chip-row">
+      {items.map((item) => (
+        <span className={`chip ${tone}`} key={item}>
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MetricCard({ label, value, detail }) {
+  return (
+    <article className="metric-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{detail}</p>
+    </article>
+  );
+}
+
+function fitLabel(score) {
+  if (score >= 75) return "Excellent fit";
+  if (score >= 55) return "Strong potential";
+  if (score >= 35) return "Needs targeted edits";
+  return "Major tailoring needed";
 }
 
 function App() {
@@ -47,13 +73,10 @@ function App() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "https://airesumeanalyzer-luly.onrender.com/api/analyze",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: formData,
+      });
       const responseText = await response.text();
       let data = {};
 
@@ -86,28 +109,54 @@ function App() {
 
   return (
     <main className="app-shell">
-      <section className="workspace">
-        <div className="intro">
+      <header className="topbar">
+        <div className="brand-mark">AI</div>
+        <div>
           <p className="eyebrow">Resume intelligence</p>
           <h1>AI Resume Analyzer</h1>
+        </div>
+      </header>
+
+      <section className="hero-panel">
+        <div className="hero-copy">
+          <h2>Match a resume to a role in seconds.</h2>
           <p>
-            Upload a resume, paste a job description, and get a practical match
-            report with missing skills and keyword coverage.
+            Upload a resume, paste a job description, and get a recruiter-style
+            breakdown of match score, required skills, preferred skills, and
+            missing keywords.
           </p>
         </div>
+        <div className="hero-stats" aria-label="Feature summary">
+          <span>PDF/TXT parsing</span>
+          <span>TF-IDF scoring</span>
+          <span>PostgreSQL history</span>
+        </div>
+      </section>
 
+      <section className="workspace">
         <form className="analyzer-panel" onSubmit={handleSubmit}>
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Input</p>
+              <h2>Analyze candidate fit</h2>
+            </div>
+            <span className="status-pill">Live API</span>
+          </div>
+
           <div className="field">
             <label htmlFor="resume">Resume file</label>
-            <input
-              id="resume"
-              type="file"
-              accept=".txt,.pdf"
-              onChange={(event) => setResume(event.target.files?.[0] || null)}
-            />
-            <span className="hint">
-              {resume ? resume.name : "PDF or TXT accepted"}
-            </span>
+            <label className="upload-box" htmlFor="resume">
+              <input
+                id="resume"
+                type="file"
+                accept=".txt,.pdf"
+                onChange={(event) => setResume(event.target.files?.[0] || null)}
+              />
+              <span className="upload-title">
+                {resume ? resume.name : "Choose a resume"}
+              </span>
+              <span className="hint">PDF or TXT accepted</span>
+            </label>
           </div>
 
           <div className="field">
@@ -123,88 +172,116 @@ function App() {
           {error && <div className="error">{error}</div>}
 
           <button className="primary-action" disabled={isLoading} type="submit">
-            {isLoading ? "Analyzing..." : "Analyze Resume"}
+            {isLoading ? "Analyzing resume..." : "Analyze Resume"}
           </button>
         </form>
-      </section>
 
-      <section className="results-area" aria-live="polite">
-        {!result && (
-          <div className="empty-state">
-            <h2>Report Preview</h2>
-            <p>
-              Your match score, keywords, missing skills, and suggestions will
-              appear here.
-            </p>
-          </div>
-        )}
-
-        {result && (
-          <>
-            <div className="score-panel">
-              <div className="score-ring" style={scoreStyle}>
-                <span>{result.match_score}%</span>
-              </div>
-              <div>
-                <p className="eyebrow">Match score</p>
-                <h2>
-                  {result.match_score >= 70
-                    ? "Strong fit"
-                    : result.match_score >= 45
-                      ? "Promising fit"
-                      : "Needs tailoring"}
-                </h2>
-                <p>
-                  Text similarity: {result.similarity_score}% | Keyword score:{" "}
-                  {result.keyword_score}%
-                </p>
-                {result.database_id && <p className="save-note">Saved report #{result.database_id}</p>}
-                {result.database_warning && <p className="save-warning">{result.database_warning}</p>}
+        <section className="results-area" aria-live="polite">
+          {!result && (
+            <div className="empty-state">
+              <div className="empty-visual">%</div>
+              <h2>Report preview</h2>
+              <p>
+                The finished report will highlight score, matched skills,
+                missing required skills, and improvement suggestions.
+              </p>
+              <div className="preview-list">
+                <span>Match score</span>
+                <span>Skill gaps</span>
+                <span>Suggestions</span>
               </div>
             </div>
+          )}
 
-            <div className="result-grid">
-              <article className="result-card">
-                <h3>Keywords Found</h3>
-                <p>{formatList(result.keywords_found)}</p>
-              </article>
+          {result && (
+            <>
+              <div className="score-panel">
+                <div className="score-ring" style={scoreStyle}>
+                  <span>{result.match_score}%</span>
+                </div>
+                <div>
+                  <p className="eyebrow">Match score</p>
+                  <h2>{fitLabel(result.match_score)}</h2>
+                  <p>
+                    Text similarity: {result.similarity_score}% | Keyword
+                    score: {result.keyword_score}%
+                  </p>
+                  {result.database_id && (
+                    <p className="save-note">Saved report #{result.database_id}</p>
+                  )}
+                  {result.database_warning && (
+                    <p className="save-warning">{result.database_warning}</p>
+                  )}
+                </div>
+              </div>
 
-              <article className="result-card">
-                <h3>Required Skills</h3>
-                <p>{formatList(result.required_skills)}</p>
-              </article>
+              <div className="metrics-grid">
+                <MetricCard
+                  label="Matched"
+                  value={result.keywords_found?.length || 0}
+                  detail="keywords found in both resume and job description"
+                />
+                <MetricCard
+                  label="Missing required"
+                  value={result.missing_required_skills?.length || 0}
+                  detail="skills to prioritize before applying"
+                />
+                <MetricCard
+                  label="Missing preferred"
+                  value={result.missing_preferred_skills?.length || 0}
+                  detail="bonus skills that can strengthen the profile"
+                />
+              </div>
 
-              <article className="result-card">
-                <h3>Preferred Skills</h3>
-                <p>{formatList(result.preferred_skills)}</p>
-              </article>
+              <div className="result-grid">
+                <article className="result-card success">
+                  <h3>Keywords Found</h3>
+                  <SkillChips items={result.keywords_found} tone="success" />
+                </article>
 
-              <article className="result-card warning">
-                <h3>Missing Required</h3>
-                <p>{formatList(result.missing_required_skills)}</p>
-              </article>
+                <article className="result-card">
+                  <h3>Required Skills</h3>
+                  <SkillChips items={result.required_skills} />
+                </article>
 
-              <article className="result-card warning">
-                <h3>Missing Preferred</h3>
-                <p>{formatList(result.missing_preferred_skills)}</p>
-              </article>
+                <article className="result-card">
+                  <h3>Preferred Skills</h3>
+                  <SkillChips items={result.preferred_skills} tone="info" />
+                </article>
 
-              <article className="result-card">
-                <h3>Resume Keywords</h3>
-                <p>{formatList(result.resume_keywords)}</p>
-              </article>
+                <article className="result-card warning">
+                  <h3>Missing Required</h3>
+                  <SkillChips
+                    items={result.missing_required_skills}
+                    tone="warning"
+                  />
+                </article>
 
-              <article className="result-card">
-                <h3>Suggestions</h3>
-                <ul>
-                  {result.suggestions.map((suggestion) => (
-                    <li key={suggestion}>{suggestion}</li>
-                  ))}
-                </ul>
-              </article>
-            </div>
-          </>
-        )}
+                <article className="result-card soft-warning">
+                  <h3>Missing Preferred</h3>
+                  <SkillChips
+                    items={result.missing_preferred_skills}
+                    tone="warning"
+                  />
+                </article>
+
+                <article className="result-card">
+                  <h3>Resume Keywords</h3>
+                  <SkillChips items={result.resume_keywords} tone="neutral" />
+                </article>
+
+                <article className="result-card suggestions">
+                  <h3>Suggestions</h3>
+                  <ul>
+                    {result.suggestions.map((suggestion) => (
+                      <li key={suggestion}>{suggestion}</li>
+                    ))}
+                  </ul>
+                </article>
+              </div>
+            </>
+          )}
+        </section>
       </section>
     </main>
   );
